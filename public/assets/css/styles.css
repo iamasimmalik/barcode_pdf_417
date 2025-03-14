@@ -1,0 +1,119 @@
+.accordion_link {
+    margin-left: 12px;
+}
+
+.green {
+    color: green;
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+.big-text {
+    font-size: larger;
+}
+
+.footer-text {
+    font-size: 0.8em;
+}
+
+.payment-information {
+    font-size: larger;
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "OCR-B";
+    src: url(https://cdn.jsdelivr.net/gh/raisty/OCR-B/dist/OCR-B.ttf) format("truetype"), url(https://cdn.jsdelivr.net/gh/raisty/OCR-B/dist/OCR-B.otf) format("opentype");
+}
+
+#referralModalDialog,
+#referralModalContent {
+    height: 80%;
+}
+
+@media (max-width: 992px) {
+    #referralModalDialog,
+    #referralModalContent {
+        height: 100%;
+    }
+}
+
+#referralModalBody {
+    max-height: 100%;
+}
+
+.custom-heading {
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+    font-weight: 300 !important;
+    font-size: calc(1.375rem + 1.5vw);
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+}
+
+.features-body {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    font-weight: 500;
+    padding-top: 1rem;
+}
+
+.features-ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.state-li {
+    display: block;
+}
+
+.state-name-bold {
+    font-weight: 500;
+}
+
+.shaking-div {
+    display: inline-block;
+    animation: shake 4s infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    10% {
+        transform: translateX(-5px);
+    }
+    20% {
+        transform: translateX(5px);
+    }
+    30% {
+        transform: translateX(-5px);
+    }
+    40% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(5px);
+    }
+    70% {
+        transform: translateY(-5px);
+    }
+    80% {
+        transform: translateY(0);
+    }
+}

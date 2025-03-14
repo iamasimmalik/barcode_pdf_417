@@ -22,7 +22,7 @@ class PDF417Controller extends Controller
 
             // Validate all input fields with strict validation
             $validated = $request->validate([
-                'NUMBER' => 'required|regex:/^\d{4}-\d{2}-\d{4}$/',
+                'NUMBER' => 'required|string',
                 'LASTNAME' => 'required|regex:/^[a-zA-Z\s]+$/',
                 'FIRSTNAME' => 'required|regex:/^[a-zA-Z\s]+$/',
                 'MIDDLENAME' => 'nullable|regex:/^[a-zA-Z\s]*$/',
@@ -41,7 +41,13 @@ class PDF417Controller extends Controller
                 'EYE' => 'required|in:BLK,BLU,BRO,GRY,GRN,HAZ,MAR',
                 'HAIR' => 'required|in:BLK,BLN,BRO,GRY,RED,WHI,BAL',
                 'RESTRICTIONS' => 'required|string',
-                'ENDORSEMENT' => 'required|string'
+                'ENDORSEMENT' => 'required|string',
+                // New AAMVA fields
+                'AUDITINFO' => 'nullable|string',
+                'INVENTORYNUM' => 'nullable|string',
+                'REVISIONDATE' => 'nullable|regex:/^\d{8}$/',
+                'DISCRIMINATOR' => 'nullable|string',
+                'SSN' => 'nullable|regex:/^\d{3}-\d{2}-\d{4}$/'
             ]);
 
             Log::info('Validation passed successfully');
@@ -49,27 +55,53 @@ class PDF417Controller extends Controller
             // Format the data in a structured way for PDF417 - AAMVA standard format
             $barcodeData = implode("\n", [
                 '@',  // Start sentinel
-                'ANSI 636014040002DL00410288ZN04330047DLDCANONE',  // Header
-                'DL' . str_replace('-', '', $request->NUMBER),
-                'DCSN' . strtoupper($request->LASTNAME),
-                'DACN' . strtoupper($request->FIRSTNAME),
-                'DAD' . ($request->MIDDLENAME ? strtoupper($request->MIDDLENAME) : ''),
-                'DBB' . $request->DOB,
-                'DBA' . $request->DOE,
-                'DBC' . $request->SEX,
-                'DAU' . str_pad($request->HEIGHT, 3, '0', STR_PAD_LEFT),
-                'DAW' . str_pad($request->WEIGHT, 3, '0', STR_PAD_LEFT),
-                'DAY' . $request->EYE,
-                'DAZ' . $request->HAIR,
-                'DAG' . strtoupper($request->ADDRESS),
-                'DAI' . strtoupper($request->CITY),
-                'DAJ' . strtoupper($request->ZIP),
-                'DAK' . strtoupper($request->STATE),  // Using user-provided state instead of hardcoded 'TX'
-                'DBD' . $request->RESTRICTIONS,
-                'DBE' . $request->ENDORSEMENT,
-                'DDD' . $request->DONOR,
+                'ANSI ' .
+                '636000' .
+                '07' .
+                '00' .
+                '02' .
+                'DL' .
+                '0041' .
+                '0278' .
+                'ZV' .
+                '0319' .
+                '0008' .
+                'DL',  // Header format exactly matching the sample
+                'DAQ' . str_replace('-', '', $request->NUMBER),  // License number
+                'DAA' . strtoupper($request->LASTNAME) . ',' . strtoupper($request->FIRSTNAME) . ',' . ($request->MIDDLENAME ? strtoupper($request->MIDDLENAME) : '') . ',',  // Full name format
+                'DAG' . strtoupper($request->ADDRESS),  // Address
+                'DAI' . strtoupper($request->CITY),  // City
+                'DAJ' . strtoupper($request->STATE),  // State/province
+                'DCJ' . ($request->filled('AUDITINFO') ? strtoupper($request->AUDITINFO) : ''),  // Audit information
+                'DCK' . ($request->filled('INVENTORYNUM') ? strtoupper($request->INVENTORYNUM) : ''),  // Inventory control number
+                'DDB' . ($request->filled('REVISIONDATE') ? $request->REVISIONDATE : ''),  // Revision date
+                'DCF' . ($request->filled('DISCRIMINATOR') ? strtoupper($request->DISCRIMINATOR) : ''),  // Discriminator
+                'DBM' . ($request->filled('SSN') ? str_replace('-', '', $request->SSN) : ''),  // Social Security Number
+                'DAK' . strtoupper($request->ZIP),  // ZIP
+                'DAR' . strtoupper($request->CLASS),  // Class
+                'DAU' . str_pad($request->HEIGHT, 3, '0', STR_PAD_LEFT) . ' cm',  // Height with cm units
+                'DAX' . str_pad($request->WEIGHT, 3, '0', STR_PAD_LEFT),  // Weight using DAX code as in sample
+                'DAY' . $request->EYE,  // Eye color
+                'DAZ' . $request->HAIR,  // Hair color
+                'DBA' . $request->DOE,  // Date of expiry
+                'DBB' . $request->DOB,  // Date of birth
+                'DBC' . $request->SEX,  // Sex
+                'DBD' . $request->DOI,  // Issue date with correct DBD code
+                'DDD' . $request->DONOR,  // Donor
                 'ZNZ'  // End sentinel
             ]);
+
+            // Filter out empty elements that might have been added for conditional fields
+            $barcodeData = implode("\n", array_filter(explode("\n", $barcodeData), function($line) {
+                // Keep lines that either don't have conditional fields or have data for conditional fields
+                return !(
+                    (strpos($line, 'DCJ') === 0 && substr($line, 3) === '') ||
+                    (strpos($line, 'DCK') === 0 && substr($line, 3) === '') ||
+                    (strpos($line, 'DDB') === 0 && substr($line, 3) === '') ||
+                    (strpos($line, 'DCF') === 0 && substr($line, 3) === '') ||
+                    (strpos($line, 'DBM') === 0 && substr($line, 3) === '')
+                );
+            }));
 
             Log::debug('Formatted barcode data:', ['data' => $barcodeData]);
 
@@ -118,11 +150,14 @@ class PDF417Controller extends Controller
 
                 // Create an img tag with proper styling for clarity
                 $wrappedBarcode = '
-                    <div style="padding:20px; background-color:#fff; display:inline-block; border:2px solid #ddd; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.15); margin:10px 0;">
-                        <img src="' . $base64 . '" alt="PDF417 Barcode" style="max-width:100%; height:auto; display:block;">
-                        <div style="margin-top:10px; text-align:center; font-family:Arial, sans-serif; font-size:14px; color:#333; font-weight:bold;">
+                    <div class="barcode-container">
+                        <img src="' . $base64 . '" alt="PDF417 Barcode" class="barcode-image" id="barcodeImage">
+                        <div class="barcode-caption">
                             Scan this barcode
                         </div>
+                        <button type="button" class="btn download-btn" onclick="downloadBarcode()">
+                            <i class="fas fa-download"></i> Download Barcode
+                        </button>
                     </div>';
 
                 Log::info('Barcode generation completed successfully');
@@ -162,11 +197,14 @@ class PDF417Controller extends Controller
                     $base64 = 'data:image/png;base64,' . base64_encode($pngData);
 
                     $wrappedBarcode = '
-                        <div style="padding:20px; background-color:#fff; display:inline-block; border:2px solid #ddd; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.15); margin:10px 0;">
-                            <img src="' . $base64 . '" alt="PDF417 Barcode (Fallback)" style="max-width:100%; height:auto; display:block;">
-                            <div style="margin-top:10px; text-align:center; font-family:Arial, sans-serif; font-size:14px; color:#333; font-weight:bold;">
+                        <div class="barcode-container">
+                            <img src="' . $base64 . '" alt="PDF417 Barcode (Fallback)" class="barcode-image" id="barcodeImage">
+                            <div class="barcode-caption">
                                 Scan this barcode (Fallback Mode)
                             </div>
+                            <button type="button" class="btn download-btn" onclick="downloadBarcode()">
+                                <i class="fas fa-download"></i> Download Barcode
+                            </button>
                         </div>';
 
                     Log::info('Fallback barcode generation successful');
@@ -202,17 +240,20 @@ class PDF417Controller extends Controller
                         $base64 = 'data:image/png;base64,' . base64_encode($pngData);
 
                         $wrappedBarcode = '
-                            <div style="padding:20px; background-color:#fff; display:inline-block; border:2px solid #ddd; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.15); margin:10px 0;">
-                                <img src="' . $base64 . '" alt="PDF417 Barcode (Last Resort)" style="max-width:100%; height:auto; display:block;">
-                                <div style="margin-top:10px; text-align:center; font-family:Arial, sans-serif; font-size:14px; color:#333; font-weight:bold;">
+                            <div class="barcode-container">
+                                <img src="' . $base64 . '" alt="PDF417 Barcode (Last Resort)" class="barcode-image" id="barcodeImage">
+                                <div class="barcode-caption">
                                     Scan this barcode (Minimal Mode)
                                 </div>
+                                <button type="button" class="btn download-btn" onclick="downloadBarcode()">
+                                    <i class="fas fa-download"></i> Download Barcode
+                                </button>
                             </div>';
 
                         Log::info('Last resort barcode generation successful');
 
-            return response()->json([
-                'success' => true,
+                        return response()->json([
+                            'success' => true,
                             'barcode' => $wrappedBarcode,
                             'message' => 'Barcode generated with minimal settings'
                         ]);
@@ -236,7 +277,75 @@ class PDF417Controller extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to generate barcode: ' . $e->getMessage()
+                'message' => 'Failed to generate barcode: ' . $e->getMessage(),
+                'debug_info' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => explode("\n", $e->getTraceAsString()),
+                    'request_data' => $request->all()
+                ]
+            ], 500);
+        }
+    }
+
+    /**
+     * Debug method to help diagnose barcode generation issues
+     */
+    public function debug(Request $request)
+    {
+        try {
+            // Get library version information
+            $barcode = new Barcode();
+            $reflector = new \ReflectionClass($barcode);
+            $libraryPath = $reflector->getFileName();
+
+            // Get available barcode types
+            $types = [];
+            if (method_exists($barcode, 'getTypes')) {
+                $types = $barcode->getTypes();
+            }
+
+            // Test basic PDF417 generation
+            $testData = "TEST DATA FOR PDF417 BARCODE";
+            $testBarcode = null;
+            $testError = null;
+
+            try {
+                $testObj = $barcode->getBarcodeObj(
+                    'PDF417',
+                    $testData,
+                    300,
+                    100,
+                    'black',
+                    [0, 0, 0, 0]
+                );
+                $testBarcode = 'data:image/png;base64,' . base64_encode($testObj->getPngData());
+            } catch (\Exception $e) {
+                $testError = $e->getMessage();
+            }
+
+            return response()->json([
+                'success' => true,
+                'library_info' => [
+                    'path' => $libraryPath,
+                    'class' => get_class($barcode),
+                    'available_types' => $types,
+                ],
+                'php_info' => [
+                    'version' => PHP_VERSION,
+                    'extensions' => get_loaded_extensions(),
+                ],
+                'test_barcode' => [
+                    'data' => $testData,
+                    'image' => $testBarcode,
+                    'error' => $testError,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Debug failed: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }

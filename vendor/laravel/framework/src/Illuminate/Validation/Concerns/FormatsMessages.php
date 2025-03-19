@@ -267,8 +267,7 @@ trait FormatsMessages
         $primaryAttribute = $this->getPrimaryAttribute($attribute);
 
         $expectedAttributes = $attribute != $primaryAttribute
-            ? [$attribute, $primaryAttribute]
-            : [$attribute];
+            ? [$attribute, $primaryAttribute] : [$attribute];
 
         foreach ($expectedAttributes as $name) {
             // The developer may dynamically specify the array of custom attributes on this

@@ -333,16 +333,9 @@ class PostgresGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        $uniqueStatement = 'unique';
-
-        if (! is_null($command->nullsNotDistinct)) {
-            $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
-        }
-
-        $sql = sprintf('alter table %s add constraint %s %s (%s)',
+        $sql = sprintf('alter table %s add constraint %s unique (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
-            $uniqueStatement,
             $this->columnize($command->columns)
         );
 

@@ -2850,9 +2850,11 @@ class Builder implements BuilderContract
     protected function removeExistingOrdersFor($column)
     {
         return (new Collection($this->orders))
-            ->reject(fn ($order) => isset($order['column']) && $order['column'] === $column)
-            ->values()
-            ->all();
+            ->reject(function ($order) use ($column) {
+                return isset($order['column'])
+                    ? $order['column'] === $column
+                    : false;
+            })->values()->all();
     }
 
     /**
@@ -3304,8 +3306,7 @@ class Builder implements BuilderContract
     {
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = stripos($column, ' as ')) !== false
-                ? substr($column, 0, $aliasPosition)
-                : $column;
+                ? substr($column, 0, $aliasPosition) : $column;
         }, $columns);
     }
 
@@ -3633,8 +3634,7 @@ class Builder implements BuilderContract
         // cast it to one. When it does we will cast it to a float since it needs to be
         // cast to the expected data type for the developers out of pure convenience.
         return ! str_contains((string) $result, '.')
-            ? (int) $result
-            : (float) $result;
+            ? (int) $result : (float) $result;
     }
 
     /**

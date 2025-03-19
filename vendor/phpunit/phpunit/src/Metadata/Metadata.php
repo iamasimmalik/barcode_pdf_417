@@ -463,7 +463,7 @@ abstract readonly class Metadata
     /**
      * @param trait-string $traitName
      */
-    public static function usesTrait(string $traitName): UsesTrait
+    public static function UsesTrait(string $traitName): UsesTrait
     {
         return new UsesTrait(self::CLASS_LEVEL, $traitName);
     }

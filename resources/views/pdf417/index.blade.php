@@ -7,385 +7,7 @@
     <title>PDF417 Barcode Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --primary-dark: #3a56d4;
-            --primary-light: #eef2ff;
-            --accent-color: #f72585;
-            --success-color: #2ec4b6;
-            --warning-color: #ff9e00;
-            --error-color: #e63946;
-            --text-primary: #2b2d42;
-            --text-secondary: #6c757d;
-            --text-light: #8d99ae;
-            --surface-color: #ffffff;
-            --background-color: #f8f9fa;
-            --border-color: #dee2e6;
-            --border-radius: 8px;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background-color: var(--background-color);
-            min-height: 100vh;
-            padding: 20px 0;
-        }
-
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: var(--surface-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-        }
-
-        .header h1 {
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 2rem;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1rem;
-            font-weight: 300;
-        }
-
-        .content-wrapper {
-            padding: 30px;
-        }
-
-        .form-section {
-            margin-bottom: 25px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 25px;
-        }
-
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .form-section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-left: 10px;
-            border-left: 3px solid var(--primary-color);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 5px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 0.95rem;
-            transition: var(--transition);
-            background-color: #fff;
-            color: var(--text-primary);
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .form-control.error {
-            border-color: var(--error-color);
-            background-color: #fff8f8;
-        }
-
-        .form-control.valid-input {
-            border-color: var(--success-color);
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%232ec4b6' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 12px 12px;
-            padding-right: 40px;
-        }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 0.75rem;
-            margin-top: 5px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-helper-text {
-            font-size: 0.7rem;
-            color: var(--text-light);
-            margin-top: 5px;
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-dark);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            background-color: var(--text-light);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-large {
-            width: 100%;
-            max-width: 250px;
-            padding: 14px 24px;
-            font-size: 1rem;
-            margin: 30px auto;
-        }
-
-        .actions-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        #barcodeResult {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .barcode-container {
-            padding: 40px;
-            background-color: #fff;
-            display: inline-block;
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            margin: 30px 0;
-            max-width: 90%;
-            transition: var(--transition);
-        }
-
-        .barcode-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-
-        .barcode-image {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            min-width: 350px;
-        }
-
-        .barcode-caption {
-            margin-top: 20px;
-            text-align: center;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .download-btn {
-            margin-top: 20px;
-            background-color: var(--success-color);
-            display: inline-flex;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            font-weight: 500;
-        }
-
-        .download-btn:hover {
-            background-color: #25a79b;
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 25px;
-            display: none;
-            font-size: 0.95rem;
-            box-shadow: var(--shadow-sm);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .alert-error {
-            background-color: #FFF5F5;
-            color: var(--error-color);
-            border-left: 4px solid var(--error-color);
-        }
-
-        .alert-success {
-            background-color: #F0FFF4;
-            color: var(--success-color);
-            border-left: 4px solid var(--success-color);
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .loading i {
-            color: var(--primary-color);
-            font-size: 2rem;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading p {
-            font-size: 1rem;
-            margin-top: 10px;
-            color: var(--text-secondary);
-        }
-
-        select.form-control {
-            height: 46px;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px 12px;
-            padding-right: 40px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
-        .optional-tag {
-            font-size: 0.7rem;
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 5px;
-            font-weight: 400;
-        }
-
-        .required-tag {
-            color: var(--error-color);
-            margin-left: 3px;
-        }
-
-        /* Improved responsiveness */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 15px;
-            }
-
-            .content-wrapper {
-                padding: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .header h1 {
-                font-size: 1.7rem;
-            }
-
-            .btn-large {
-                max-width: 100%;
-            }
-
-            .barcode-container {
-                padding: 25px;
-            }
-
-            .barcode-image {
-                min-width: 0;
-            }
-        }
-
-        /* Added animations for better interactivity */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
-        }
-
-        .pulse {
-            animation: pulse 1.5s infinite;
-        }
-    </style>
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -398,7 +20,13 @@
             <div class="content-wrapper">
                 <div id="alertBox" class="alert"></div>
 
-                <form id="barcodeForm" method="POST" action="{{ route('pdf417.generate') }}">
+                <div class="actions-container mb-3">
+                    <button type="button" class="btn btn-large" id="fillSampleDataBtn" style="background-color: var(--warning-color);">
+                        <i class="fas fa-fill-drip"></i> Fill with Sample Data
+                    </button>
+                </div>
+
+                <form id="barcodeForm" method="post" action="{{ route('pdf417.generate') }}">
                     @csrf
 
                     <!-- Personal Information Section -->
@@ -410,10 +38,12 @@
                             <div class="form-group">
                                 <label for="NUMBER">Document Number <span class="required-tag">*</span></label>
                                 <input type="text" id="NUMBER" name="NUMBER" class="form-control"
-                                      placeholder="Enter document number" required
-                                      title="Document Number" oninvalid="this.setCustomValidity('Please enter a document number')"
+                                      placeholder="Example: TX-DL 12345678" required
+                                      title="Document Number (letters, numbers, and common characters allowed)"
+                                      oninvalid="this.setCustomValidity('Please enter a document number')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Please enter a document number</span>
+                                <div class="form-helper-text">Can contain letters, numbers, spaces, and special characters</div>
                             </div>
 
                             <div class="form-group">
@@ -423,6 +53,7 @@
                                       title="Letters and spaces only" oninvalid="this.setCustomValidity('Last name can only contain letters and spaces')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Please enter a valid last name (letters and spaces only)</span>
+                                <div class="form-helper-text">Enter your last name using only letters and spaces</div>
                             </div>
 
                             <div class="form-group">
@@ -432,6 +63,7 @@
                                       title="Letters and spaces only" oninvalid="this.setCustomValidity('First name can only contain letters and spaces')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Please enter a valid first name (letters and spaces only)</span>
+                                <div class="form-helper-text">Enter your first name using only letters and spaces</div>
                             </div>
 
                             <div class="form-group">
@@ -441,6 +73,7 @@
                                       title="Letters and spaces only" oninvalid="this.setCustomValidity('Middle name can only contain letters and spaces')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Middle name can only contain letters and spaces</span>
+                                <div class="form-helper-text">Enter your middle name using only letters and spaces</div>
                             </div>
 
                             <div class="form-group">
@@ -463,6 +96,7 @@
                                     <option value="F">Female</option>
                                 </select>
                                 <span class="error-message">Please select a gender</span>
+                                <div class="form-helper-text">Select M for Male or F for Female</div>
                             </div>
 
                             <div class="form-group">
@@ -472,6 +106,7 @@
                                       title="Height between 30-100 inches" oninvalid="this.setCustomValidity('Please enter a valid height between 30-100 inches')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Please enter a valid height (30-100 inches)</span>
+                                <div class="form-helper-text">Enter height in inches (30-100)</div>
                             </div>
 
                             <div class="form-group">
@@ -481,6 +116,7 @@
                                       title="Weight between 50-500 lbs" oninvalid="this.setCustomValidity('Please enter a valid weight between 50-500 lbs')"
                                       oninput="this.setCustomValidity('')">
                                 <span class="error-message">Please enter a valid weight (50-500 lbs)</span>
+                                <div class="form-helper-text">Enter weight in pounds (50-500)</div>
                             </div>
 
                             <div class="form-group">
@@ -498,6 +134,7 @@
                                     <option value="MAR">Maroon</option>
                                 </select>
                                 <span class="error-message">Please select an eye color</span>
+                                <div class="form-helper-text">Select your eye color from the dropdown</div>
                             </div>
 
                             <div class="form-group">
@@ -515,6 +152,7 @@
                                     <option value="BAL">Bald</option>
                                 </select>
                                 <span class="error-message">Please select a hair color</span>
+                                <div class="form-helper-text">Select your hair color from the dropdown</div>
                             </div>
 
                             <div class="form-group">
@@ -641,29 +279,37 @@
                             <div class="form-group">
                                 <label for="SSN">Social Security Number <span class="optional-tag">Optional</span></label>
                                 <input type="text" id="SSN" name="SSN" class="form-control"
-                                      placeholder="Enter SSN"
-                                      title="Social Security Number"
+                                      placeholder="Example: 123-45-6789"
+                                      pattern="(\d{3}-\d{2}-\d{4}|\d{9})"
+                                      title="Enter SSN as 123-45-6789 or 123456789"
                                       oninvalid="this.setCustomValidity('Please enter a valid Social Security Number')"
                                       oninput="this.setCustomValidity('')">
-                                <span class="error-message">Please enter a valid Social Security Number</span>
+                                <span class="error-message">Please enter a valid Social Security Number (format: XXX-XX-XXXX or XXXXXXXXX)</span>
+                                <div class="form-helper-text">Enter as XXX-XX-XXXX or XXXXXXXXX (with or without dashes)</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="AUDITINFO">Audit Information <span class="optional-tag">Optional</span></label>
                                 <input type="text" id="AUDITINFO" name="AUDITINFO" class="form-control"
-                                      placeholder="Audit information" maxlength="50"
-                                      title="Audit information" oninvalid="this.setCustomValidity('Invalid audit information')"
+                                      placeholder="Example: Audit #123-A45" maxlength="50"
+                                      pattern="[a-zA-Z0-9\s\-\.,'#]+"
+                                      title="Letters, numbers, spaces, and common characters allowed"
+                                      oninvalid="this.setCustomValidity('Please use only letters, numbers, spaces, and common characters')"
                                       oninput="this.setCustomValidity('')">
-                                <span class="error-message">Invalid audit information format</span>
+                                <span class="error-message">Please use only letters, numbers, spaces, and common characters</span>
+                                <div class="form-helper-text">Can contain letters, numbers, spaces, and special characters</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="INVENTORYNUM">Inventory Control Number <span class="optional-tag">Optional</span></label>
                                 <input type="text" id="INVENTORYNUM" name="INVENTORYNUM" class="form-control"
-                                      placeholder="Inventory control number" maxlength="30"
-                                      title="Inventory control number" oninvalid="this.setCustomValidity('Invalid inventory control number')"
+                                      placeholder="Example: INV-2023-45678" maxlength="30"
+                                      pattern="[a-zA-Z0-9\s\-\.,'#]+"
+                                      title="Letters, numbers, spaces, and common characters allowed"
+                                      oninvalid="this.setCustomValidity('Please use only letters, numbers, spaces, and common characters')"
                                       oninput="this.setCustomValidity('')">
-                                <span class="error-message">Invalid inventory control number format</span>
+                                <span class="error-message">Please use only letters, numbers, spaces, and common characters</span>
+                                <div class="form-helper-text">Can contain letters, numbers, spaces, and special characters</div>
                             </div>
 
                             <div class="form-group">
@@ -676,12 +322,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="DISCRIMINATOR">Discriminator <span class="optional-tag">Optional</span></label>
+                                <label for="DISCRIMINATOR">Discriminator (DD Number) <span class="optional-tag">Optional</span></label>
                                 <input type="text" id="DISCRIMINATOR" name="DISCRIMINATOR" class="form-control"
-                                      placeholder="Discriminator" maxlength="25"
-                                      title="Discriminator" oninvalid="this.setCustomValidity('Invalid discriminator format')"
+                                      placeholder="Example: DD-123-456-789" maxlength="25"
+                                      pattern="[a-zA-Z0-9\s\-\.,'#]+"
+                                      title="Letters, numbers, spaces, and common characters allowed"
+                                      oninvalid="this.setCustomValidity('Please use only letters, numbers, spaces, and common characters')"
                                       oninput="this.setCustomValidity('')">
-                                <span class="error-message">Invalid discriminator format</span>
+                                <span class="error-message">Please use only letters, numbers, spaces, and common characters</span>
+                                <div class="form-helper-text">Can contain letters, numbers, spaces, and special characters</div>
                             </div>
                         </div>
                     </div>
@@ -710,26 +359,101 @@
             const loading = document.querySelector('.loading');
             const barcodeResult = document.getElementById('barcodeResult');
             const generateBtn = document.getElementById('generateBtn');
+            const fillSampleDataBtn = document.getElementById('fillSampleDataBtn');
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Fill sample data function
+            function fillSampleData() {
+                console.log('Filling sample data...');
+
+                const sampleData = {
+                    'NUMBER': 'TX-DL 12345678',
+                    'LASTNAME': 'Smith',
+                    'FIRSTNAME': 'John',
+                    'MIDDLENAME': 'Robert',
+                    'DOB': '01151985',
+                    'SEX': 'M',
+                    'HEIGHT': '70',
+                    'WEIGHT': '180',
+                    'EYE': 'BRO',
+                    'HAIR': 'BRO',
+                    'DONOR': 'YES',
+                    'ADDRESS': '123 Main Street',
+                    'CITY': 'Austin',
+                    'STATE': 'TX',
+                    'ZIP': '78701',
+                    'CLASS': 'C',
+                    'RESTRICTIONS': 'NONE',
+                    'ENDORSEMENT': 'NONE',
+                    'DOI': '01012022',
+                    'DOE': '01012027',
+                    'SSN': '123-45-6789',
+                    'AUDITINFO': 'Audit #123-A45',
+                    'INVENTORYNUM': 'INV-2023-45678',
+                    'REVISIONDATE': '05152023',
+                    'DISCRIMINATOR': 'DD-123-456-789'
+                };
+
+                try {
+                    // Fill the form with sample data
+                    Object.keys(sampleData).forEach(field => {
+                        const input = document.querySelector(`[name="${field}"]`);
+                        if (input) {
+                            console.log(`Filling ${field} with ${sampleData[field]}`);
+                            input.value = sampleData[field];
+
+                            // Trigger change event for select elements
+                            if (input.tagName === 'SELECT') {
+                                const event = new Event('change');
+                                input.dispatchEvent(event);
+                            }
+
+                            // Add valid-input class for visual feedback
+                            input.classList.add('valid-input');
+
+                            // Trigger input event to update validation
+                            const inputEvent = new Event('input');
+                            input.dispatchEvent(inputEvent);
+                        } else {
+                            console.warn(`Field ${field} not found in the form`);
+                        }
+                    });
+
+                    // Show success message
+                    showAlert('Form filled with sample data. You can edit fields as needed before generating the barcode.', 'success');
+                } catch (error) {
+                    console.error('Error filling sample data:', error);
+                    showAlert('Error filling sample data. Please try again.', 'error');
+                }
+            }
+
+            // Add click event listener to the fill sample data button
+            if (fillSampleDataBtn) {
+                fillSampleDataBtn.addEventListener('click', fillSampleData);
+                console.log('Fill sample data button event listener attached');
+            } else {
+                console.error('Fill sample data button not found');
+            }
 
             // Add auto-formatting for specific fields
             const formatterConfig = {
-                'NUMBER': {
-                    pattern: /^(\d{0,4})[-]?(\d{0,2})[-]?(\d{0,4})$/,
-                    format: function(value) {
-                        const parts = value.match(this.pattern);
-                        if (!parts) return value;
-
-                        let formatted = '';
-                        if (parts[1]) formatted += parts[1];
-                        if (parts[1] && parts[2]) formatted += '-';
-                        if (parts[2]) formatted += parts[2];
-                        if (parts[2] && parts[3]) formatted += '-';
-                        if (parts[3]) formatted += parts[3];
-
-                        return formatted;
-                    }
-                },
+                // Remove strict NUMBER formatter to make it more flexible like a city field
+                // 'NUMBER': {
+                //     pattern: /^(\d{0,4})[-]?(\d{0,2})[-]?(\d{0,4})$/,
+                //     format: function(value) {
+                //         const parts = value.match(this.pattern);
+                //         if (!parts) return value;
+                //
+                //         let formatted = '';
+                //         if (parts[1]) formatted += parts[1];
+                //         if (parts[1] && parts[2]) formatted += '-';
+                //         if (parts[2]) formatted += parts[2];
+                //         if (parts[2] && parts[3]) formatted += '-';
+                //         if (parts[3]) formatted += parts[3];
+                //
+                //         return formatted;
+                //     }
+                // },
                 'DOB': {
                     pattern: /^(\d{0,2})(\d{0,2})(\d{0,4})$/,
                     validate: function(value) {

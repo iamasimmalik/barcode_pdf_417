@@ -2,13 +2,23 @@
 
 namespace Illuminate\Log\Context;
 
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Log\ContextLogProcessor as ContextLogProcessorContract;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Monolog\LogRecord;
 
 class ContextLogProcessor implements ContextLogProcessorContract
 {
+    /**
+     * Create a new ContextLogProcessor instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct(protected Application $app)
+    {
+    }
+
     /**
      * Add contextual data to the log's "extra" parameter.
      *
@@ -17,15 +27,13 @@ class ContextLogProcessor implements ContextLogProcessorContract
      */
     public function __invoke(LogRecord $record): LogRecord
     {
-        $app = Container::getInstance();
-
-        if (! $app->bound(ContextRepository::class)) {
+        if (! $this->app->bound(ContextRepository::class)) {
             return $record;
         }
 
         return $record->with(extra: [
             ...$record->extra,
-            ...$app->get(ContextRepository::class)->all(),
+            ...$this->app[ContextRepository::class]->all(),
         ]);
     }
 }

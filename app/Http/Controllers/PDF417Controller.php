@@ -20,22 +20,22 @@ class PDF417Controller extends Controller
             Log::info('Starting barcode generation process');
             Log::debug('Received request data:', $request->all());
 
-            // Validate all input fields with strict validation
+            // Validate all input fields with simplified validation
             $validated = $request->validate([
                 'NUMBER' => 'required|string',
-                'LASTNAME' => 'required|regex:/^[a-zA-Z\s]+$/',
-                'FIRSTNAME' => 'required|regex:/^[a-zA-Z\s]+$/',
-                'MIDDLENAME' => 'nullable|regex:/^[a-zA-Z\s]*$/',
+                'LASTNAME' => 'required|string',
+                'FIRSTNAME' => 'required|string',
+                'MIDDLENAME' => 'nullable|string',
                 'ADDRESS' => 'required|string',
                 'CITY' => 'required|string',
-                'ZIP' => 'required|regex:/^\d{5}$/',
-                'STATE' => 'required|regex:/^[A-Z]{2}$/',  // Two-letter state code
-                'CLASS' => 'required|regex:/^[A-Z0-9]+$/',
+                'ZIP' => 'required|string',
+                'STATE' => 'required|string',
+                'CLASS' => 'required|string',
                 'SEX' => 'required|in:M,F',
                 'DONOR' => 'required|in:YES,NO',
-                'DOB' => 'required|regex:/^\d{8}$/',
-                'DOI' => 'required|regex:/^\d{8}$/',
-                'DOE' => 'required|regex:/^\d{8}$/',
+                'DOB' => 'required|string',
+                'DOI' => 'required|string',
+                'DOE' => 'required|string',
                 'HEIGHT' => 'required|numeric|min:30|max:100',
                 'WEIGHT' => 'required|numeric|min:50|max:500',
                 'EYE' => 'required|in:BLK,BLU,BRO,GRY,GRN,HAZ,MAR',
@@ -45,12 +45,23 @@ class PDF417Controller extends Controller
                 // New AAMVA fields
                 'AUDITINFO' => 'nullable|string',
                 'INVENTORYNUM' => 'nullable|string',
-                'REVISIONDATE' => 'nullable|regex:/^\d{8}$/',
+                'REVISIONDATE' => 'nullable|string',
                 'DISCRIMINATOR' => 'nullable|string',
-                'SSN' => 'nullable|regex:/^\d{3}-\d{2}-\d{4}$/'
+                'SSN' => 'nullable|string'
             ]);
 
             Log::info('Validation passed successfully');
+
+            // Format SSN properly for barcode data (XXX-XX-XXXX)
+            $formattedSSN = '';
+            if ($request->filled('SSN')) {
+                $ssn = str_replace(['-', ' '], '', $request->SSN); // Remove dashes and spaces
+                if (is_numeric($ssn) && strlen($ssn) === 9) {
+                    $formattedSSN = substr($ssn, 0, 3) . '-' . substr($ssn, 3, 2) . '-' . substr($ssn, 5, 4);
+                } else {
+                    Log::warning('SSN format is invalid: ' . $request->SSN);
+                }
+            }
 
             // Format the data in a structured way for PDF417 - AAMVA standard format
             $barcodeData = implode("\n", [
@@ -76,7 +87,7 @@ class PDF417Controller extends Controller
                 'DCK' . ($request->filled('INVENTORYNUM') ? strtoupper($request->INVENTORYNUM) : ''),  // Inventory control number
                 'DDB' . ($request->filled('REVISIONDATE') ? $request->REVISIONDATE : ''),  // Revision date
                 'DCF' . ($request->filled('DISCRIMINATOR') ? strtoupper($request->DISCRIMINATOR) : ''),  // Discriminator
-                'DBM' . ($request->filled('SSN') ? str_replace('-', '', $request->SSN) : ''),  // Social Security Number
+                'DBM' . ($request->filled('SSN') ? str_replace('-', '', $formattedSSN) : ''),  // Social Security Number
                 'DAK' . strtoupper($request->ZIP),  // ZIP
                 'DAR' . strtoupper($request->CLASS),  // Class
                 'DAU' . str_pad($request->HEIGHT, 3, '0', STR_PAD_LEFT) . ' cm',  // Height with cm units

@@ -564,7 +564,7 @@ trait HasRelationships
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
      * @param  string|null  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this>
      */
     public function belongsToMany(
         $related,
@@ -624,7 +624,7 @@ trait HasRelationships
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Relations\Pivot>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel>
      */
     protected function newBelongsToMany(
         Builder $query,
@@ -821,9 +821,8 @@ trait HasRelationships
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $segments = [
-            $instance
-                ? $instance->joiningTableSegment()
-                : Str::snake(class_basename($related)),
+            $instance ? $instance->joiningTableSegment()
+                      : Str::snake(class_basename($related)),
             $this->joiningTableSegment(),
         ];
 

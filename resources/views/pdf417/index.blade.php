@@ -13,8 +13,8 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <h1><i class="fas fa-barcode"></i> PDF417 Barcode Generator</h1>
-                <p>Generate standardized PDF417 barcodes for identification documents</p>
+                {{-- <h1><i class="fas fa-barcode"></i> PDF417 Barcode Generator</h1>
+                <p>Generate standardized PDF417 barcodes for identification documents</p> --}}
             </div>
 
             <div class="content-wrapper">

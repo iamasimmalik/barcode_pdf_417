@@ -205,12 +205,18 @@ body {
 }
 
 .barcode-container {
-    display: none;
+    display: block;
     background-color: var(--primary-light);
     padding: 30px;
     border-radius: var(--border-radius);
     margin-top: 30px;
     text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+#barcodeResult {
+    margin-top: 30px;
+    width: 100%;
 }
 
 .barcode-image {

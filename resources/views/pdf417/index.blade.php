@@ -656,8 +656,16 @@
                         barcodeResult.innerHTML = data.barcode;
                         showAlert(data.message || 'Barcode generated successfully!', 'success');
 
-                        // Scroll to the result
-                        barcodeResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        // Ensure the barcode container is visible
+                        const barcodeContainer = document.querySelector('.barcode-container');
+                        if (barcodeContainer) {
+                            barcodeContainer.style.display = 'block';
+                        }
+
+                        // Scroll to the result with a slight delay to ensure content is rendered
+                        setTimeout(() => {
+                            barcodeResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
                     } else {
                         console.error('Barcode generation failed:', data.message);
                         showAlert(data.message || 'Failed to generate barcode', 'error');

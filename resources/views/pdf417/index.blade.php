@@ -696,7 +696,52 @@
 
     <!-- Download barcode functionality -->
     <script>
-        function downloadBarcode() {
+
+
+function downloadBarcode() {
+    const barcodeImage = document.getElementById('barcodeImage');
+
+    if (!barcodeImage) {
+        console.error('Barcode image not found');
+        return;
+    }
+
+    // Create a temporary canvas to draw the barcode
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set the canvas dimensions to match the barcode image
+    canvas.width = barcodeImage.naturalWidth; // Use naturalWidth for the original size
+    canvas.height = barcodeImage.naturalHeight; // Use naturalHeight for the original size
+
+    // Fill the canvas with a white background
+    ctx.fillStyle = 'white'; // Set background color to white
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the barcode image onto the canvas
+    ctx.drawImage(barcodeImage, 0, 0);
+
+    // Create a temporary anchor element for download
+    const downloadLink = document.createElement('a');
+
+    // Get image src (base64 data)
+    const imageSrc = canvas.toDataURL('image/png'); // Convert canvas to image data
+    downloadLink.href = imageSrc;
+
+    // Set filename
+    const formattedDate = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+    downloadLink.download = `PDF417-Barcode-${formattedDate}.png`;
+
+    // Append to document, click, and remove
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    console.log('Barcode download initiated');
+}
+
+
+        function downloadBarcode222() {
             const barcodeImage = document.getElementById('barcodeImage');
 
             if (!barcodeImage) {
